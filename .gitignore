@@ -1,0 +1,11 @@
+.DS_Store
+.svn
+node_modules
+npm-debug.log
+lib/check/pagelist.txt
+acommandhelp
+
+unloadimg.txt
+.vscode/
+_publist.txt
+.idea/
