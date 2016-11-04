@@ -5,6 +5,7 @@ var Engine = Matter.Engine,
     Composites = Matter.Composites,
     Constraint = Matter.Constraint,
     Common = Matter.Common, 
+    Mouse = Matter.Mouse,
     MouseConstraint = Matter. MouseConstraint,   
     Bodies = Matter.Bodies;
     
@@ -18,11 +19,16 @@ var render = Render.create({
     engine: engine
 });
 engine.world.gravity.y = 0;
-
 // create two boxes and a ground
 var boxA = Bodies.circle(400, 200, 10);
 var boxB = Bodies.circle(450, 200, 10);
 var boxC = Bodies.circle(500, 200, 10);
+
+Mouse.create();
+ MouseConstraint.create(engine, {
+            element: Render.canvas
+        });
+// MouseConstraint.create(engine);
 // 宽高是基于坐标点对称渲染，而不是顶点渲染
 var ground = Bodies.rectangle(400, 600, 800, 20, { isStatic: true });
 var ground1 = Bodies.rectangle(400, 0, 800, 20, { isStatic: true });
