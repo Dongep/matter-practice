@@ -1,4 +1,4 @@
-// module aliases
+// 缩写
 var Engine = Matter.Engine,
     Render = Matter.Render,
     World = Matter.World,
@@ -14,20 +14,26 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies;
 
 
-// create an engine
+// 引擎
 var engine = Engine.create({
-    enableSleeping: true
+    enableSleeping: true,
 });
+//重力为0
 engine.world.gravity.y = 0;
+//创建模拟物理世界
 var world = World.create();
-// create a renderer
+// 渲染器
 var render = Render.create({
     element: document.getElementById('matter'),
     engine: engine,
-    showAngleIndicator: true,
-    showVelocity: true
+    width: 800,
+    height: 600,
+    // showAngleIndicator: true,
+    // showVelocity: true,
+    wireframes: true,
 });
-
+render.options.showAngleIndicator = true;
+render.options.showVelocity = true;
 //物体的种类
 var category1 = 0x0001,
     category2 = 0x0002,
@@ -41,48 +47,104 @@ var mouseConstraint = MouseConstraint.create(engine, {
 });
 // mouseConstraint.collisionFilter.mask = category2;
 // render.mouse = mouseConstraint.mouse;
-render.options.showAngleIndicator = true;
-render.options.showVelocity = true;
 
-//创建物体
-var ballA = Bodies.circle(400, 200, 10,{
-    collisionFilter: {
-        category:category1
-    },
-    restitution: 1,
-    friction: 0.05
-});
-var ballB = Bodies.circle(450, 200, 10,{
-    collisionFilter: {
-        category:category1
-    },
-    restitution: 1,
-    friction: 0.05
-});
-var ballC = Bodies.circle(500, 200, 10,{
-    collisionFilter: {
-        category:category1
-    },
-    restitution: 1,
-    friction: 0.05
-});
 
-var ballW = Bodies.circle(500, 300, 10,{
+//球的通用设置
+var ballOption = {
     collisionFilter: {
         category:category1
+    },
+    // render: {
+    //     fillStyle: '#666',
+    //     strokeStyle: 'white'
+    // },
+    restitution: 1,
+    friction: 0.05,
+    frictionAir: 0.01,
+    mass: 0
+}
+var ballOption2 = {
+    collisionFilter: {
+        category:category1
+    },
+    render: {
+        fillStyle : '#556270',
+        strokeStyle : '#556270',
+        lineWidth: 3
     },
     restitution: 1,
     friction: 0.05,
-    sleepThreshold: 0.1
-});
+    frictionAir: 0.01
+}
+//计算初始时球的相对位置
+function ballrelativeTop(position) { 
+    return {
+        x: position.x+17.32,
+        y: position.y+10
+    }
+}
+function ballrelativeBot(position) { 
+    return {
+        x: position.x+17.32,
+        y: position.y-10
+    }
+}
+var ballinit = [{
+    x:600,
+    y:300
+}];
+//计算所有球的初始摆放位置
+function ballPosition(balls) {
+    var ballsTem = [];
+    for( let i = 0;i < balls.length; i++ )
+    {
+        if(i==0){
+            ballsTem.push(ballrelativeTop(balls[i]));
+            ballsTem.push(ballrelativeBot(balls[i]));
+        }
+        else{
+            ballsTem.push(ballrelativeBot(balls[i]));
+        }
+    }
+    ballinit = ballinit.concat(ballsTem);
+    if(ballsTem.length < 4){
+        ballPosition(ballsTem)
+    }
+    else{
+        ballPlace(ballinit);
+        console.log(ballinit)
+    }
+}
+//摆放球
+function ballPlace(position) {
+    for( let i = 0;i < position.length; i++ ) {
+        let ball = Bodies.circle(position[i].x, position[i].y,9,ballOption);
+        console.log(ball)
+        World.add(engine.world, ball);
+
+        
+    }
+}
+ballPosition(ballinit);
+
+// var ballA = Bodies.circle(400, 200, 10,ballOption);
+// var ballB = Bodies.circle(450, 200, 10,ballOption);
+// var ballC = Bodies.circle(500, 200, 10,ballOption);
+
+
+
 // Body.setInertia(ballW, 1)
+//白球
+var ballW = Bodies.circle(200, 300, 10,ballOption);
 //球杆
-var boxA = Bodies.trapezoid(50, 30, 10, 500, 0.5 ,{
+var boxA = Bodies.trapezoid(50, 300, 10, 500, 0.5 ,{
     isSensor: true,
     collisionFilter: {
         category:category2
     }
 });
+
+
 //球杆中心点距离顶端的距离
 var center = 500*(1 - 2 + Math.sqrt(2.5));
 
@@ -104,7 +166,7 @@ var center = 500*(1 - 2 + Math.sqrt(2.5));
 //     constraints: constraint1,
 // });
 
-// Mouse.create();
+// 球杆与鼠标的关联事件
 function rod(ball,rod) { 
     var ballX = ball.position.x,
         ballY = ball.position.y;
@@ -126,7 +188,7 @@ function rod(ball,rod) {
             angle = Math.PI-angle+Math.PI;
         }
         angle = angle +Math.PI/2;
-        Matter.Body.setPosition(rod, {
+        Body.setPosition(rod, {
             x: positionX,
             y: positionY
         })
@@ -167,7 +229,7 @@ function rod(ball,rod) {
         var rodMoveX = -moveLength* Math.cos(angle);
         var rodMoveY = -moveLength* Math.sin(angle);
         if(!isNaN(positionX-rodMoveX)&&!isNaN(positionY-rodMoveY))
-        Matter.Body.setPosition(rod, {
+        Body.setPosition(rod, {
             x: positionX-rodMoveX,
             y: positionY-rodMoveY
         });
@@ -175,8 +237,10 @@ function rod(ball,rod) {
             x: rodMoveX*0.0002,
             y: rodMoveY*0.0002           
         }
+        
+        
     }
-    Events.on(mouseConstraint, "mousemove", mousemoveEvent);
+    // Events.on(mouseConstraint, "mousemove", mousemoveEvent);
     Events.on(mouseConstraint, "mousedown", function (event) { 
         clickX = event.mouse.position.x,
         clickY = event.mouse.position.y;
@@ -186,29 +250,60 @@ function rod(ball,rod) {
     Events.on(mouseConstraint, "mouseup", function (event) { 
         Events.on(mouseConstraint, "mousemove",mousemoveEvent);
         Events.off(mouseConstraint, "mousemove",forceEvent);
-        Body.applyForce(ball, ball.position, verctorRod)
+        if(verctorRod.x&&verctorRod.y)
+        {
+            Body.applyForce(ball, ball.position, verctorRod)
+            // Body.setVelocity(ball, ball.position, verctorRod)            
+        }
     });
     Events.on(ball, "sleepStart", function () { 
-
+        ballX = ball.position.x,
+        ballY = ball.position.y;
+        verctorRod={};
+        Events.on(mouseConstraint, "mousemove", mousemoveEvent);
      })
      Events.on(ball, "sleepEnd", function () { 
-        
+        Events.off(mouseConstraint, "mousemove",mousemoveEvent)
      })
     
 }
 rod(ballW,boxA);
 
+// 球桌边界
+var groundOption = { isStatic: true,restitution: 1};
+var ground = Bodies.rectangle(400, 600, 800, 20, groundOption);
+var ground1 = Bodies.rectangle(400, 0, 800, 20, groundOption);
+var ground2 = Bodies.rectangle(0, 300, 20, 600, groundOption);
+var ground3 = Bodies.rectangle(800, 300, 20, 600, groundOption);
+//球洞
+for(let i = 0;i<6;i++)
+{
+    let y = 20;
+    let x = 380*i + 20;
+    if(i>=3)
+    {
+        y = 580;
+        x = 380*(i-3) + 20
+    }
+    
+    let hole = Bodies.circle(x, y, 12 ,{
+        isSensor: true,
+        render: {
+            fillStyle: '#C44D58',
+            strokeStyle: 'transparent'
+        }
+    });
+    World.add(engine.world, hole);
+    Events.on(engine, "collisionStart", function (event) { 
+        var pairs = event.pairs;
+        console.log(pairs)
+     })
+}
 
-// MouseConstraint.create(engine);
-// 宽高是基于坐标点对称渲染，而不是顶点渲染
-var ground = Bodies.rectangle(400, 600, 800, 20, { isStatic: true,restitution:0.5 });
-var ground1 = Bodies.rectangle(400, 0, 800, 20, { isStatic: true,restitution:0.5 });
-var ground2 = Bodies.rectangle(0, 300, 20, 600, { isStatic: true,restitution:0.5 });
-var ground3 = Bodies.rectangle(800, 300, 20, 600, { isStatic: true,restitution:0.5 });
-// add all of the bodies to the world
+
 
 // add all of the bodies to the world
-World.add(engine.world, [mouseConstraint,ballA, ballB,ballC,ballW,boxA,ground, ground1, ground2, ground3]);
+World.add(engine.world, [mouseConstraint,ballW,boxA,ground, ground1, ground2, ground3]);
 // run the engine
 Engine.run(engine);
 
