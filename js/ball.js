@@ -28,12 +28,10 @@ var render = Render.create({
     engine: engine,
     width: 800,
     height: 600,
-    // showAngleIndicator: true,
-    // showVelocity: true,
-    wireframes: true,
 });
 render.options.showAngleIndicator = true;
 render.options.showVelocity = true;
+render.options.wireframes = false;
 //物体的种类
 var category1 = 0x0001,
     category2 = 0x0002,
@@ -54,22 +52,17 @@ var ballOption = {
     collisionFilter: {
         category:category1
     },
-    // render: {
-    //     fillStyle: '#666',
-    //     strokeStyle: 'white'
-    // },
     restitution: 1,
     friction: 0.05,
     frictionAir: 0.01,
-    mass: 0
 }
 var ballOption2 = {
     collisionFilter: {
         category:category1
     },
     render: {
-        fillStyle : '#556270',
-        strokeStyle : '#556270',
+        fillStyle : '#000000',
+        strokeStyle : 'solid',
         lineWidth: 3
     },
     restitution: 1,
@@ -121,8 +114,6 @@ function ballPlace(position) {
         let ball = Bodies.circle(position[i].x, position[i].y,9,ballOption);
         console.log(ball)
         World.add(engine.world, ball);
-
-        
     }
 }
 ballPosition(ballinit);
@@ -135,7 +126,18 @@ ballPosition(ballinit);
 
 // Body.setInertia(ballW, 1)
 //白球
-var ballW = Bodies.circle(200, 300, 10,ballOption);
+var ballW = Bodies.circle(200, 300, 9,{
+    collisionFilter: {
+        category:category1
+    },
+    render: {
+        fillStyle : '#ffffff',
+        strokeStyle : '#000000',
+    },
+    restitution: 1,
+    friction: 0.05,
+    frictionAir: 0.01,
+});
 //球杆
 var boxA = Bodies.trapezoid(50, 300, 10, 500, 0.5 ,{
     isSensor: true,
@@ -289,13 +291,13 @@ for(let i = 0;i<6;i++)
     let hole = Bodies.circle(x, y, 12 ,{
         isSensor: true,
         render: {
-            fillStyle: '#C44D58',
+            fillStyle: '#000000',
             strokeStyle: 'transparent'
         }
     });
     World.add(engine.world, hole);
     Events.on(engine, "collisionStart", function (event) { 
-        var pairs = event.pairs;
+        let pairs = event.pairs;
         console.log(pairs)
      })
 }

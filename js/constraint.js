@@ -27,36 +27,27 @@ var render = Render.create({
     engine: engine,
     width: 800,
     height: 600,
-    // showAngleIndicator: true,
-    // showVelocity: true,
-    wireframes: true,
 });
 render.options.showAngleIndicator = true;
 render.options.showVelocity = true;
 render.options.wireframes = false;
 Render.run(render);
-
 var mouseConstraint = MouseConstraint.create(engine, {
     element: document.querySelector('canvas')
 });
 
 
-var ground = Bodies.rectangle(400, 600, 800, 20,{ 
-    isStatic: true,
-    restitution: 0.1,
-});
-// add all of the bodies to the world
-World.add(engine.world, [ground,mouseConstraint]);
-//通用设置
-var particleOptions = { 
-    friction: 0.05,
-    frictionStatic: 0.1
-};
 
+
+//创建Body
+var body1 = Bodies.circle(200, 0, 20);
+var body2 = Bodies.rectangle(400, 300, 30,30,{ isStatic: true});
+var constraint1 = Constraint.create({
+    bodyA: body1,
+    bodyB: body2,
+    length: 100,
+    stiffness: 0.1,
+})
 // add all of the bodies to the world
- World.add(engine.world, [
-            Composites.softBody(250, 100, 5, 5, 0, 0, true, 18, particleOptions),
-            Composites.softBody(400, 300, 8, 3, 0, 0, true, 15, particleOptions),
-            Composites.softBody(250, 400, 4, 4, 0, 0, true, 15, particleOptions)
-        ]);
+World.add(engine.world, [mouseConstraint,body1,body2,constraint1]);
 Engine.run(engine);

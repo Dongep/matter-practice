@@ -26,13 +26,11 @@ var render = Render.create({
     element: document.getElementById('matter'),
     engine: engine,
     width: 800,
-    height: 600,
-    // showAngleIndicator: true,
-    // showVelocity: true,
-    wireframes: true,
+    height: 600
 });
 render.options.showAngleIndicator = true;
 render.options.showVelocity = true;
+render.options.wireframes = false;
 Render.run(render);
 var mouseConstraint = MouseConstraint.create(engine, {
     element: document.querySelector('canvas')
@@ -53,7 +51,11 @@ var body1 = Bodies.circle(200, 0, 10,ballOption);
 var body2 = Bodies.rectangle(650, 0, 30,30,ballOption);
 var ground = Bodies.rectangle(400, 590, 800, 20, {
      isStatic: true, //是否设置为静态物体
-     restitution: 0.5
+     restitution: 0.5,
+     render: {
+         fillStyle: '#545454',
+         strokeStyle: '#000000'
+     } 
 });
 var ground1 = Bodies.rectangle(200, 400, 300, 20,{ 
     isStatic: true,
@@ -69,3 +71,8 @@ var ground2 = Bodies.rectangle(600, 400, 300, 20,{
 // add all of the bodies to the world
 World.add(engine.world, [mouseConstraint,body1,body2,ground, ground1, ground2]);
 Engine.run(engine);
+
+function add(){
+    var body = Bodies.rectangle(Common.random(100, 700), 100, Common.random(10, 50), Common.random(10, 50));
+    World.add(engine.world, body);
+}
