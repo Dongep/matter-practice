@@ -41,7 +41,7 @@ var mouseConstraint = MouseConstraint.create(engine, {
 
 //创建Body
 var body1 = Bodies.circle(200, 0, 20);
-var body2 = Bodies.rectangle(400, 300, 30,30,{ isStatic: true});
+var body2 = Bodies.rectangle(400, 300, 30, 30, { isStatic: true });
 var constraint1 = Constraint.create({
     bodyA: body1,
     bodyB: body2,
@@ -49,5 +49,5 @@ var constraint1 = Constraint.create({
     stiffness: 0.1,
 })
 // add all of the bodies to the world
-World.add(engine.world, [mouseConstraint,body1,body2,constraint1]);
+World.add(engine.world, [mouseConstraint, body1, body2, constraint1]);
 Engine.run(engine);
